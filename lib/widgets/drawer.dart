@@ -85,7 +85,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 height: Platform.isIOS
                     ? config.App(context).appHeight(2)
                     : config.App(context).appHeight(2.5)),
-            user["type"] != "admin"
+            user["type"] == "admin"
                 ? Column(
                     children: [
                       InkWell(

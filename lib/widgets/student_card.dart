@@ -252,7 +252,7 @@ class StudentCard extends StatelessWidget {
                               fontSize: Platform.isIOS
                                   ? config.App(context).appHeight(1.8)
                                   : config.App(context).appHeight(2.1),
-                              color: student["current_step"] == 74
+                              color: int.parse(student["current_step"]) == 74
                                   ? Color(0xFF177247)
                                   : Colors.orange),
                         ),

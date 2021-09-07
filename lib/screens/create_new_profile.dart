@@ -573,7 +573,7 @@ class _CreateNewProfileState extends State<CreateNewProfile> {
                           "application": _application,
                           "department": valueTest,
                           "id": id,
-                          "current_step": 1,
+                          "current_step": "1",
                           "lower_case_name": fullName.toLowerCase(),
                           "document_check_status": "Documents Not Checked",
                           "decument_check_note": "",

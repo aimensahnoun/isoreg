@@ -78,12 +78,40 @@ class _StudentDetailsState extends State<StudentDetails> {
     ).show();
   }
 
-  void go(int index) async {
+  void go(int index, userData) async {
     if (index == -1 && _index <= 0) {
       return;
     }
 
     if (index == 1 && _index >= 6) {
+      return;
+    }
+
+    if ((_index == 5 && widget.student["application"] == "Bachlors") ||
+        (_index == 4 && widget.student["application"] == "Masters")) {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var jwt = await prefs.getString("jwt");
+      Provider.of<DataProvider>(context, listen: false)
+          .updateStep(widget.student["pin_code"], 74);
+      var url = Uri.parse(
+          "https://isoreg.herokuapp.com/students/update/${widget.student["pin_code"]}");
+      http.Response response = await http.put(url,
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+            "Authorization": "Bearer ${jwt}",
+          },
+          body: jsonEncode({
+            "current_step": 74,
+          }));
+      widget.student["current_step"] = 74;
+      DateTime now = new DateTime.now();
+      DateTime date =
+          new DateTime(now.year, now.month, now.day, now.hour, now.minute);
+      addLog(
+          "${userData["name"]} finished student: ${widget.student["pin_code"]} 's registration",
+          date.toString());
+
+      showCongrats();
       return;
     }
 
@@ -101,6 +129,7 @@ class _StudentDetailsState extends State<StudentDetails> {
     var denklinkNote = "";
     var userData = Provider.of<DataProvider>(context, listen: false).user;
 
+    print(widget.student["current_step"]);
     return Scaffold(
       backgroundColor: Colors.white,
       body: ModalProgressHUD(
@@ -669,10 +698,10 @@ class _StudentDetailsState extends State<StudentDetails> {
                         ),
                       ],
                 onStepCancel: () {
-                  go(-1);
+                  go(-1, userData);
                 },
                 onStepContinue: () {
-                  go(1);
+                  go(1, userData);
                 },
                 onStepTapped: (index) {
                   setState(() {
@@ -903,29 +932,6 @@ class _StudentDetailsState extends State<StudentDetails> {
                                   (int.parse(widget.student["current_step"]) +
                                           1)
                                       .toString();
-                            } catch (e) {
-                              print(e);
-                            }
-                          }
-
-                          if ((_index == 5 &&
-                                  widget.student["application"] ==
-                                      "Bachlors") ||
-                              (_index == 4 &&
-                                  widget.student["application"] == "Masters")) {
-                            try {
-                              Provider.of<DataProvider>(context, listen: false)
-                                  .updateStep(widget.student["pin_code"], 74);
-
-                              widget.student["current_step"] = 74;
-                              DateTime now = new DateTime.now();
-                              DateTime date = new DateTime(now.year, now.month,
-                                  now.day, now.hour, now.minute);
-                              addLog(
-                                  "${userData["name"]} finished student: ${widget.student["pin_code"]} 's registration",
-                                  date.toString());
-
-                              showCongrats();
                             } catch (e) {
                               print(e);
                             }
