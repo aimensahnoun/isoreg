@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import "package:flutter/material.dart";
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../helpers/custom_icons_icons.dart';
 import '../provider/data_provider.dart';
 import '../screens/student_list.dart';
@@ -10,6 +13,7 @@ import 'package:enhance_stepper/enhance_stepper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'dart:io' show Platform;
+import 'package:http/http.dart' as http;
 
 class StudentDetails extends StatefulWidget {
   late var student;
@@ -44,12 +48,10 @@ class _StudentDetailsState extends State<StudentDetails> {
   bool canMove = true;
   var docCheckValue = "Documents Not Checked";
   var denklilValue = "Denklik Not Done";
-  var docCheckNote = "";
-  var denklinkNote = "";
 
   @override
   void didChangeDependencies() {
-    if ((widget.student["current_step"] != 74)) {
+    if ((int.parse(widget.student["current_step"]) != 74)) {
       _index = int.parse(widget.student["current_step"]) - 1;
       docCheckValue = widget.student["document_check_status"];
       denklilValue = widget.student["denklik_application_status"];
@@ -85,7 +87,7 @@ class _StudentDetailsState extends State<StudentDetails> {
       return;
     }
 
-    if (widget.student["current_step"] == 74) {
+    if (int.parse(widget.student["current_step"]) == 74) {
       return;
     }
 
@@ -95,7 +97,10 @@ class _StudentDetailsState extends State<StudentDetails> {
   }
 
   Widget build(BuildContext context) {
+    var docCheckNote = "";
+    var denklinkNote = "";
     var userData = Provider.of<DataProvider>(context, listen: false).user;
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: ModalProgressHUD(
@@ -254,8 +259,8 @@ class _StudentDetailsState extends State<StudentDetails> {
                               Container(
                                 constraints: BoxConstraints(
                                   maxWidth: Platform.isIOS
-                                      ? config.App(context).appWidth(20)
-                                      : config.App(context).appWidth(15),
+                                      ? config.App(context).appWidth(40)
+                                      : config.App(context).appWidth(35),
                                 ),
                                 child: Text(
                                   widget.student["pin_code"],
@@ -333,7 +338,8 @@ class _StudentDetailsState extends State<StudentDetails> {
                                       : config.App(context).appWidth(50),
                                 ),
                                 child: Text(
-                                  widget.student["current_step"] == 74
+                                  int.parse(widget.student["current_step"]) ==
+                                          74
                                       ? "Registration Complete"
                                       : (widget.student["application"] ==
                                               "Bachlors"
@@ -351,10 +357,11 @@ class _StudentDetailsState extends State<StudentDetails> {
                                       fontSize: Platform.isIOS
                                           ? config.App(context).appHeight(1.8)
                                           : config.App(context).appHeight(2.1),
-                                      color:
-                                          widget.student["current_step"] == 74
-                                              ? Color(0xFF177247)
-                                              : Colors.orange),
+                                      color: int.parse(widget
+                                                  .student["current_step"]) ==
+                                              74
+                                          ? Color(0xFF177247)
+                                          : Colors.orange),
                                 ),
                               ),
                             ],
@@ -408,7 +415,7 @@ class _StudentDetailsState extends State<StudentDetails> {
                                     ),
                                     onChanged: (String? newValue) {
                                       setState(() {
-                                        docCheckValue = newValue!;
+                                        docCheckValue = newValue ?? "";
                                       });
                                     },
                                     isExpanded: true,
@@ -432,7 +439,7 @@ class _StudentDetailsState extends State<StudentDetails> {
                                   },
                                   controller: TextEditingController()
                                     ..text =
-                                        widget.student["decument_check_note"] ??
+                                        widget.student["document_check_note"] ??
                                             "",
                                   style: const TextStyle(
                                     fontFamily: "Proxima",
@@ -497,7 +504,7 @@ class _StudentDetailsState extends State<StudentDetails> {
                                   ),
                                   onChanged: (String? newValue) {
                                     setState(() {
-                                      denklilValue = newValue!;
+                                      denklilValue = newValue ?? "";
                                     });
                                   },
                                   isExpanded: true,
@@ -520,7 +527,7 @@ class _StudentDetailsState extends State<StudentDetails> {
                                 },
                                 autocorrect: false,
                                 controller: TextEditingController()
-                                  ..text = widget.student["denklik_note"],
+                                  ..text = widget.student["denklik_note"] ?? "",
                                 style: const TextStyle(
                                   fontFamily: "Proxima",
                                 ),
@@ -545,7 +552,8 @@ class _StudentDetailsState extends State<StudentDetails> {
                         ),
                         EnhanceStep(
                           isActive: (_index > 5 ||
-                                  widget.student["current_step"] == 74)
+                                  int.parse(widget.student["current_step"]) ==
+                                      74)
                               ? true
                               : false,
                           title: Text(
@@ -589,7 +597,7 @@ class _StudentDetailsState extends State<StudentDetails> {
                                     ),
                                     onChanged: (String? newValue) {
                                       setState(() {
-                                        docCheckValue = newValue!;
+                                        docCheckValue = newValue ?? "";
                                       });
                                     },
                                     isExpanded: true,
@@ -649,7 +657,8 @@ class _StudentDetailsState extends State<StudentDetails> {
                         ),
                         EnhanceStep(
                           isActive: (_index > 4 ||
-                                  widget.student["current_step"] == 74)
+                                  int.parse(widget.student["current_step"]) ==
+                                      74)
                               ? true
                               : false,
                           title: Text(
@@ -680,7 +689,8 @@ class _StudentDetailsState extends State<StudentDetails> {
                       ),
                       TextButton(
                         onPressed: () async {
-                          if (_index + 1 != widget.student["current_step"] ||
+                          if (_index + 1 !=
+                                  int.parse(widget.student["current_step"]) ||
                               _index == 0) {
                             return;
                           }
@@ -688,14 +698,16 @@ class _StudentDetailsState extends State<StudentDetails> {
                             isLoading = true;
                           });
                           try {
-                            await FirebaseFirestore.instance
-                                .collection("students")
-                                .doc(widget.student["id"])
-                                .set({
-                              ...widget.student,
-                              "current_step": widget.student["current_step"] - 1
-                            });
-                            widget.student["current_step"] -= 1;
+                            Provider.of<DataProvider>(context, listen: false)
+                                .updateStep(
+                                    widget.student["pin_code"],
+                                    int.parse(widget.student["current_step"]) -
+                                        1);
+
+                            widget.student["current_step"] =
+                                (int.parse(widget.student["current_step"]) - 1)
+                                    .toString();
+                            print(widget.student["current_step"]);
                           } catch (e) {
                             print(e);
                           }
@@ -711,7 +723,8 @@ class _StudentDetailsState extends State<StudentDetails> {
                       ),
                       ElevatedButton(
                         onPressed: () async {
-                          if (_index + 1 != widget.student["current_step"]) {
+                          if (_index + 1 !=
+                              int.parse(widget.student["current_step"])) {
                             return;
                           }
                           setState(() {
@@ -724,27 +737,39 @@ class _StudentDetailsState extends State<StudentDetails> {
                                   _index == 4 &&
                                   denklilValue != "Denklik Done")) {
                             try {
-                              await FirebaseFirestore.instance
-                                  .collection("students")
-                                  .doc(widget.student["id"])
-                                  .set({
-                                ...widget.student,
-                                "document_check_status": _index == 1
-                                    ? docCheckValue
-                                    : widget.student["document_check_status"],
-                                "decument_check_note": docCheckNote !=
-                                        widget.student["decument_check_note"]
-                                    ? docCheckNote
-                                    : widget.student["decument_check_note"],
-                                "denklik_application_status": _index == 4
-                                    ? denklilValue
-                                    : widget
-                                        .student["denklik_application_status"],
-                                "denklik_note": denklinkNote !=
-                                        widget.student["denklik_note"]
-                                    ? denklinkNote
-                                    : widget.student["denklik_note"],
-                              });
+                              SharedPreferences prefs =
+                                  await SharedPreferences.getInstance();
+                              var jwt = await prefs.getString("jwt");
+                              var url = Uri.parse(
+                                  "https://isoreg.herokuapp.com/students/update/${widget.student["pin_code"]}");
+                              http.Response response = await http.put(url,
+                                  headers: <String, String>{
+                                    'Content-Type':
+                                        'application/json; charset=UTF-8',
+                                    "Authorization": "Bearer ${jwt}",
+                                  },
+                                  body: jsonEncode({
+                                    "document_check_status": _index == 1
+                                        ? docCheckValue
+                                        : widget
+                                            .student["document_check_status"],
+                                    "document_check_note": docCheckNote !=
+                                            widget
+                                                .student["document_check_note"]
+                                        ? docCheckNote
+                                        : (widget.student[
+                                                "document_check_note"] ??
+                                            ""),
+                                    "denklik_application_status": _index == 4
+                                        ? denklilValue
+                                        : widget.student[
+                                            "denklik_application_status"],
+                                    "denklik_note": denklinkNote !=
+                                            widget.student["denklik_note"]
+                                        ? denklinkNote
+                                        : widget.student["denklik_note"] ?? "",
+                                  }));
+
                               //Document Check status log
                               if (_index == 1 &&
                                   (widget.student["document_check_status"] !=
@@ -752,27 +777,21 @@ class _StudentDetailsState extends State<StudentDetails> {
                                 DateTime now = new DateTime.now();
                                 DateTime date = new DateTime(now.year,
                                     now.month, now.day, now.hour, now.minute);
-                                await FirebaseFirestore.instance
-                                    .collection("logs")
-                                    .add({
-                                  "message":
-                                      "${userData["name"]} updated the document check status to ${docCheckValue} for student : ${widget.student["pin_code"]}",
-                                  "time": date.toString(),
-                                });
+
+                                addLog(
+                                    "${userData["name"]} updated the document check status to ${docCheckValue} for student : ${widget.student["pin_code"]}",
+                                    date.toString());
                               }
 
                               //Document Check Note log
                               if (docCheckNote !=
-                                  widget.student["decument_check_note"]) {
+                                  widget.student["document_check_note"]) {
                                 DateTime now = new DateTime.now();
                                 DateTime date = new DateTime(now.year,
                                     now.month, now.day, now.hour, now.minute);
-                                await FirebaseFirestore.instance
-                                    .collection("logs")
-                                    .add({
-                                  "message":
-                                      "${userData["name"]} updated the document check note to ${docCheckNote} for student : ${widget.student["pin_code"]}"
-                                });
+                                addLog(
+                                    "${userData["name"]} updated the document check note to ${docCheckNote} for student : ${widget.student["pin_code"]}",
+                                    date.toString());
                               }
                               //Denklik Note Log
                               if (denklinkNote !=
@@ -780,13 +799,9 @@ class _StudentDetailsState extends State<StudentDetails> {
                                 DateTime now = new DateTime.now();
                                 DateTime date = new DateTime(now.year,
                                     now.month, now.day, now.hour, now.minute);
-                                await FirebaseFirestore.instance
-                                    .collection("logs")
-                                    .add({
-                                  "message":
-                                      "${userData["name"]} updated the denklik application status to ${denklilValue} for student : ${widget.student["pin_code"]}",
-                                  "time": date.toString(),
-                                });
+                                addLog(
+                                    "${userData["name"]} updated the denklik application status to ${denklilValue} for student : ${widget.student["pin_code"]}",
+                                    date.toString());
                               }
                               //Denklik step log
                               if (_index == 4 &&
@@ -796,24 +811,22 @@ class _StudentDetailsState extends State<StudentDetails> {
                                 DateTime now = new DateTime.now();
                                 DateTime date = new DateTime(now.year,
                                     now.month, now.day, now.hour, now.minute);
-                                await FirebaseFirestore.instance
-                                    .collection("logs")
-                                    .add({
-                                  "message":
-                                      "${userData["name"]} updated the denklik application status to ${denklilValue} for student : ${widget.student["pin_code"]}",
-                                  "time": date.toString(),
-                                });
+                                addLog(
+                                    "${userData["name"]} updated the denklik application status to ${denklilValue} for student : ${widget.student["pin_code"]}",
+                                    date.toString());
                               }
 
                               widget.student["denklik_note"] =
                                   denklinkNote != widget.student["denklik_note"]
                                       ? denklinkNote
-                                      : widget.student["denklik_note"];
-                              widget.student["decument_check_note"] =
+                                      : widget.student["denklik_note"] ?? "";
+                              widget.student["document_check_note"] =
                                   docCheckNote !=
-                                          widget.student["decument_check_note"]
+                                          widget.student["document_check_note"]
                                       ? docCheckNote
-                                      : widget.student["decument_check_note"];
+                                      : (widget
+                                              .student["document_check_note"] ??
+                                          "");
                             } catch (e) {
                               print(e);
                             }
@@ -823,31 +836,42 @@ class _StudentDetailsState extends State<StudentDetails> {
                           }
 
                           if (canMove) {
-                            try {
-                              await FirebaseFirestore.instance
-                                  .collection("students")
-                                  .doc(widget.student["id"])
-                                  .set({
-                                ...widget.student,
-                                "current_step":
-                                    widget.student["current_step"] + 1,
-                                "document_check_status": _index == 1
-                                    ? docCheckValue
-                                    : widget.student["document_check_status"],
-                                "decument_check_note": docCheckNote !=
-                                        widget.student["decument_check_note"]
-                                    ? docCheckNote
-                                    : widget.student["decument_check_note"],
-                                "denklik_application_status": _index == 4
-                                    ? denklilValue
-                                    : widget
-                                        .student["denklik_application_status"],
-                                "denklik_note": denklinkNote !=
-                                        widget.student["denklik_note"]
-                                    ? denklinkNote
-                                    : widget.student["denklik_note"],
-                              });
+                            SharedPreferences prefs =
+                                await SharedPreferences.getInstance();
+                            var jwt = await prefs.getString("jwt");
 
+                            var url = Uri.parse(
+                                "https://isoreg.herokuapp.com/students/update/${widget.student["pin_code"]}");
+                            http.Response response = await http.put(url,
+                                headers: <String, String>{
+                                  'Content-Type':
+                                      'application/json; charset=UTF-8',
+                                  "Authorization": "Bearer ${jwt}",
+                                },
+                                body: jsonEncode({
+                                  "current_step": int.parse(
+                                          widget.student["current_step"]) +
+                                      1,
+                                  "document_check_status": _index == 1
+                                      ? docCheckValue
+                                      : widget.student["document_check_status"],
+                                  "document_check_note": docCheckNote !=
+                                          widget.student["document_check_note"]
+                                      ? docCheckNote
+                                      : (widget
+                                              .student["document_check_note"] ??
+                                          ""),
+                                  "denklik_application_status": _index == 4
+                                      ? denklilValue
+                                      : widget.student[
+                                          "denklik_application_status"],
+                                  "denklik_note": denklinkNote !=
+                                          widget.student["denklik_note"]
+                                      ? denklinkNote
+                                      : widget.student["denklik_note"] ?? "",
+                                }));
+
+                            try {
                               if ((_index != 5 &&
                                       widget.student["application"] ==
                                           "Bachlors") ||
@@ -857,25 +881,28 @@ class _StudentDetailsState extends State<StudentDetails> {
                                 DateTime now = new DateTime.now();
                                 DateTime date = new DateTime(now.year,
                                     now.month, now.day, now.hour, now.minute);
-                                await FirebaseFirestore.instance
-                                    .collection("logs")
-                                    .add({
-                                  "message":
-                                      "${userData["name"]} moved the student ${widget.student["pin_code"]} to ${widget.student["application"] == "Bachlors" ? stepsBsc[widget.student["current_step"] + 1] : stepsMsc[widget.student["current_step"] + 1]}",
-                                  "time": date.toString(),
-                                });
+
+                                addLog(
+                                    "${userData["name"]} moved the student ${widget.student["pin_code"]} to ${widget.student["application"] == "Bachlors" ? stepsBsc[(int.parse(widget.student["current_step"]) + 1).toString()] : stepsMsc[(int.parse(widget.student["current_step"]) + 1).toString()]}",
+                                    date.toString());
                               }
 
                               widget.student["denklik_note"] =
                                   denklinkNote != widget.student["denklik_note"]
                                       ? denklinkNote
-                                      : widget.student["denklik_note"];
-                              widget.student["decument_check_note"] =
+                                      : (widget.student["denklik_note"] ?? "");
+                              widget.student["document_check_note"] =
                                   docCheckNote !=
-                                          widget.student["decument_check_note"]
+                                          widget.student["document_check_note"]
                                       ? docCheckNote
-                                      : widget.student["decument_check_note"];
-                              widget.student["current_step"] += 1;
+                                      : (widget
+                                              .student["document_check_note"] ??
+                                          "");
+
+                              widget.student["current_step"] =
+                                  (int.parse(widget.student["current_step"]) +
+                                          1)
+                                      .toString();
                             } catch (e) {
                               print(e);
                             }
@@ -887,25 +914,17 @@ class _StudentDetailsState extends State<StudentDetails> {
                               (_index == 4 &&
                                   widget.student["application"] == "Masters")) {
                             try {
-                              await FirebaseFirestore.instance
-                                  .collection("students")
-                                  .doc(widget.student["id"])
-                                  .set({
-                                ...widget.student,
-                                "current_step": 74,
-                              });
+                              Provider.of<DataProvider>(context, listen: false)
+                                  .updateStep(widget.student["pin_code"], 74);
 
                               widget.student["current_step"] = 74;
                               DateTime now = new DateTime.now();
                               DateTime date = new DateTime(now.year, now.month,
                                   now.day, now.hour, now.minute);
-                              await FirebaseFirestore.instance
-                                  .collection("logs")
-                                  .add({
-                                "message":
-                                    "${userData["name"]} finished student: ${widget.student["pin_code"]} 's registration",
-                                "time": date.toString(),
-                              });
+                              addLog(
+                                  "${userData["name"]} finished student: ${widget.student["pin_code"]} 's registration",
+                                  date.toString());
+
                               showCongrats();
                             } catch (e) {
                               print(e);
@@ -930,5 +949,26 @@ class _StudentDetailsState extends State<StudentDetails> {
         ),
       ),
     );
+  }
+}
+
+void addLog(message, time) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  var jwt = await prefs.getString("jwt");
+  var response =
+      await http.post(Uri.parse("https://isoreg.herokuapp.com/tracks"),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+            "Authorization": "Bearer ${jwt}",
+          },
+          body: jsonEncode({
+            "message": message,
+            "time": time,
+          }));
+  if (response.statusCode == 200) {
+    String data = response.body;
+    var decodedData = jsonDecode(data);
+  } else {
+    print(response.body);
   }
 }

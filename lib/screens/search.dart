@@ -71,9 +71,100 @@ class _SearchState extends State<Search> {
                           width: config.App(context).appWidth(75),
                           child: TextField(
                             autocorrect: false,
-                            onSubmitted: (_) {
+                            onSubmitted: (_) async {
                               setState(() {
                                 isSearching = true;
+                              });
+                              var student = "";
+                              SharedPreferences prefs =
+                                  await SharedPreferences.getInstance();
+                              var jwt = await prefs.getString("jwt");
+
+                              if (isNumeric(searchText)) {
+                                var tempStudent = await http.get(
+                                  Uri.parse(
+                                      "https://isoreg.herokuapp.com/students/pin/${searchText}"),
+                                  headers: <String, String>{
+                                    'Content-Type':
+                                        'application/json; charset=UTF-8',
+                                    "Authorization": "Bearer ${jwt}",
+                                  },
+                                );
+
+                                if (tempStudent.statusCode == 200) {
+                                  String data = await tempStudent.body;
+                                  var decodedData = jsonDecode(data);
+
+                                  student = decodedData;
+                                } else {
+                                  print(tempStudent.body);
+                                }
+
+                                if (tempStudent.statusCode == 404) {
+                                  tempStudent = await http.get(
+                                    Uri.parse(
+                                        "https://isoreg.herokuapp.com/students/passport/${searchText}"),
+                                    headers: <String, String>{
+                                      'Content-Type':
+                                          'application/json; charset=UTF-8',
+                                      "Authorization": "Bearer ${jwt}",
+                                    },
+                                  );
+
+                                  if (tempStudent.statusCode == 200) {
+                                    String data = await tempStudent.body;
+                                    var decodedData = jsonDecode(data);
+
+                                    student = decodedData;
+                                  } else {
+                                    print(tempStudent.body);
+                                  }
+                                }
+                              } else if (isAlphanumeric(searchText)) {
+                                var tempStudent = await http.get(
+                                  Uri.parse(
+                                      "https://isoreg.herokuapp.com/students/passport/${searchText}"),
+                                  headers: <String, String>{
+                                    'Content-Type':
+                                        'application/json; charset=UTF-8',
+                                    "Authorization": "Bearer ${jwt}",
+                                  },
+                                );
+
+                                if (tempStudent.statusCode == 200) {
+                                  String data = await tempStudent.body;
+                                  var decodedData = jsonDecode(data);
+                                  student = decodedData;
+                                } else {
+                                  print(tempStudent.body);
+                                }
+                              } else {
+                                var tempStudent = await http.get(
+                                  Uri.parse(
+                                      "https://isoreg.herokuapp.com/students/name/${config.convertString(searchText)}"),
+                                  headers: <String, String>{
+                                    'Content-Type':
+                                        'application/json; charset=UTF-8',
+                                    "Authorization": "Bearer ${jwt}",
+                                  },
+                                );
+
+                                if (tempStudent.statusCode == 200) {
+                                  String data = await tempStudent.body;
+                                  var decodedData = jsonDecode(data);
+
+                                  student = decodedData;
+                                } else {
+                                  print(tempStudent.body);
+                                }
+                              }
+                              result = student == "" ? null : student;
+
+                              setState(() {
+                                result = student == "" ? null : student;
+                                ;
+                                isSearching = false;
+                                isSearchDone = true;
                               });
                             },
                             onChanged: (value) {
@@ -128,7 +219,7 @@ class _SearchState extends State<Search> {
                               if (tempStudent.statusCode == 200) {
                                 String data = await tempStudent.body;
                                 var decodedData = jsonDecode(data);
-                                print(decodedData);
+
                                 student = decodedData;
                               } else {
                                 print(tempStudent.body);
@@ -193,10 +284,12 @@ class _SearchState extends State<Search> {
                                 print(tempStudent.body);
                               }
                             }
-                            result = student;
+                            result = student == "" ? null : student;
+                            ;
 
                             setState(() {
-                              result = student;
+                              result = student == "" ? null : student;
+                              ;
                               isSearching = false;
                               isSearchDone = true;
                             });
@@ -208,7 +301,7 @@ class _SearchState extends State<Search> {
                 ),
               ),
               isSearchDone
-                  ? (result.length == 0
+                  ? (result == null || result.length == 0
                       ? Expanded(
                           child: Center(
                             child: Text(

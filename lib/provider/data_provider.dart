@@ -198,4 +198,45 @@ class DataProvider extends ChangeNotifier {
     }
     notifyListeners();
   }
+
+  void updateStep(pin, step) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var jwt = await prefs.getString("jwt");
+    var url = Uri.parse("https://isoreg.herokuapp.com/students/update/${pin}");
+    http.Response response = await http.put(url,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          "Authorization": "Bearer ${jwt}",
+        },
+        body: jsonEncode({"current_step": step}));
+
+    var decodedData2;
+
+    if (response.statusCode == 200) {
+    } else {}
+  }
+
+  void addLog(message, time) async {
+    print("IN HERE");
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var jwt = await prefs.getString("jwt");
+    var response =
+        await http.post(Uri.parse("https://isoreg.herokuapp.com/tracks"),
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+              "Authorization": "Bearer ${jwt}",
+            },
+            body: jsonEncode({
+              "message": message,
+              "time": time,
+            }));
+    if (response.statusCode == 200) {
+      print("HOLAAAA");
+      String data = response.body;
+      var decodedData = jsonDecode(data);
+      print(decodedData);
+    } else {
+      print(response.body);
+    }
+  }
 }

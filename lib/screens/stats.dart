@@ -328,29 +328,30 @@ class _StatsState extends State<Stats> {
                                           children: [
                                             DeparmentChart(
                                               larg: int.parse(
-                                                  bachApplis[0]["count"]),
+                                                  masterApplis[0]["count"]),
                                               title: "Total Masters Students",
                                               count: int.parse(
-                                                  bachApplis[0]["count"]),
+                                                  masterApplis[0]["count"]),
                                               type: 1,
                                             ),
                                             DeparmentChart(
                                               larg: int.parse(
-                                                  bachApplis[0]["count"]),
+                                                  masterApplis[0]["count"]),
                                               title: masterStats[i]
                                                   ["department"],
                                               count: int.parse(
-                                                  bachlorStats[i]["count"]),
+                                                  masterStats[i]["count"]),
                                               type: 1,
                                             )
                                           ],
                                         );
                                       }
                                       return DeparmentChart(
-                                        larg: int.parse(bachApplis[0]["count"]),
-                                        title: bachlorStats[i]["department"],
+                                        larg:
+                                            int.parse(masterApplis[0]["count"]),
+                                        title: masterStats[i]["department"],
                                         count:
-                                            int.parse(bachlorStats[i]["count"]),
+                                            int.parse(masterStats[i]["count"]),
                                         type: 1,
                                       );
                                     },

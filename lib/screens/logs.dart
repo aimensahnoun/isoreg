@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:isoregistration/provider/data_provider.dart';
+import 'package:isoregistration/screens/logs_search.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../helpers/custom_icons_icons.dart';
@@ -66,16 +67,21 @@ class _LogsPageState extends State<LogsPage> {
                           fontFamily: "Proxima",
                         ),
                       ),
-                      // IconButton(
-                      //   onPressed: () {},
-                      //   icon: Icon(
-                      //     CustomIcons.search_alt,
-                      //     size: Platform.isIOS
-                      //         ? config.App(context).appHeight(4)
-                      //         : config.App(context).appHeight(4.5),
-                      //   ),
-                      //   color: Colors.black,
-                      // )
+                      IconButton(
+                        onPressed: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (BuildContext ctx) => LogSearch(
+                                    logs: logs,
+                                  )));
+                        },
+                        icon: Icon(
+                          CustomIcons.search_alt,
+                          size: Platform.isIOS
+                              ? config.App(context).appHeight(4)
+                              : config.App(context).appHeight(4.5),
+                        ),
+                        color: Colors.black,
+                      )
                     ],
                   ),
                   SizedBox(
@@ -93,8 +99,8 @@ class _LogsPageState extends State<LogsPage> {
                           ),
                           width: double.infinity,
                           height: Platform.isIOS
-                              ? config.App(context).appHeight(14)
-                              : config.App(context).appHeight(16),
+                              ? config.App(context).appHeight(17)
+                              : config.App(context).appHeight(19),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(15),

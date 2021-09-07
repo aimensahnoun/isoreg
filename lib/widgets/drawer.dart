@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import "package:flutter/material.dart";
+import 'package:isoregistration/screens/login_screen.dart';
 import "package:provider/provider.dart";
 import '../helpers/custom_icons_icons.dart';
 import '../provider/data_provider.dart';
@@ -160,6 +161,9 @@ class _CustomDrawerState extends State<CustomDrawer> {
               onTap: () async {
                 FirebaseAuth auth = FirebaseAuth.instance;
                 await auth.signOut();
+                //   Navigator.of(context).pushReplacement(MaterialPageRoute(
+                //       builder: (BuildContext ctx) => LoginScreen()));
+                // },
               },
               child: Row(
                 children: [
