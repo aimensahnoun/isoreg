@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "1020081845385",
+    "project_id": "isoreg-b680e",
+    "storage_bucket": "isoreg-b680e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1020081845385:android:0c20e0d1fd0d1647c6c258",
+        "android_client_info": {
+          "package_name": "com.iso.registry"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1020081845385-n5fn2u945hrfl0o99li5s6oa577gedm9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDISzFaFnFg32r_6QZgUY1PigvQkfW7_sQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1020081845385-n5fn2u945hrfl0o99li5s6oa577gedm9.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1020081845385-42a1srs1qg5aomr854uh6hm482cq4bk3.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.iso.registry"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
