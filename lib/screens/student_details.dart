@@ -22,20 +22,20 @@ class StudentDetails extends StatefulWidget {
 class _StudentDetailsState extends State<StudentDetails> {
   @override
   var stepsBsc = {
-    1: "Deposit Payment",
-    2: "Document Check",
-    3: "Tuition Fees Payment",
-    4: "Final Acceptance Letter",
-    5: "Denklik Application",
-    6: "Registration"
+    "1": "Deposit Payment",
+    "2": "Document Check",
+    "3": "Tuition Fees Payment",
+    "4": "Final Acceptance Letter",
+    "5": "Denklik Application",
+    "6": "Registration"
   };
 
   var stepsMsc = {
-    1: "Deposit Payment",
-    2: "Document Check",
-    3: "Tuition Fees Payment",
-    4: "Final Acceptance Letter",
-    5: "Registration"
+    "1": "Deposit Payment",
+    "2": "Document Check",
+    "3": "Tuition Fees Payment",
+    "4": "Final Acceptance Letter",
+    "5": "Registration"
   };
 
   bool isLoading = false;
@@ -50,7 +50,7 @@ class _StudentDetailsState extends State<StudentDetails> {
   @override
   void didChangeDependencies() {
     if ((widget.student["current_step"] != 74)) {
-      _index = widget.student["current_step"] - 1;
+      _index = int.parse(widget.student["current_step"]) - 1;
       docCheckValue = widget.student["document_check_status"];
       denklilValue = widget.student["denklik_application_status"];
     } else {
@@ -432,7 +432,8 @@ class _StudentDetailsState extends State<StudentDetails> {
                                   },
                                   controller: TextEditingController()
                                     ..text =
-                                        widget.student["decument_check_note"],
+                                        widget.student["decument_check_note"] ??
+                                            "",
                                   style: const TextStyle(
                                     fontFamily: "Proxima",
                                   ),
