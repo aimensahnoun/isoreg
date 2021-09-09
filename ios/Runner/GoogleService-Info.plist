@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>1020081845385-42a1srs1qg5aomr854uh6hm482cq4bk3.apps.googleusercontent.com</string>
+	<string>1020081845385-ijr7ljpoeophi5l1f6cjq1q3csknoff1.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.1020081845385-42a1srs1qg5aomr854uh6hm482cq4bk3</string>
+	<string>com.googleusercontent.apps.1020081845385-ijr7ljpoeophi5l1f6cjq1q3csknoff1</string>
 	<key>API_KEY</key>
 	<string>AIzaSyBqHwzpchpCcmskOvWTvNoiKkZfRRedysI</string>
 	<key>GCM_SENDER_ID</key>
@@ -13,7 +13,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.iso.registry</string>
+	<string>com.bau.isoregistry</string>
 	<key>PROJECT_ID</key>
 	<string>isoreg-b680e</string>
 	<key>STORAGE_BUCKET</key>
@@ -29,6 +29,8 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:1020081845385:ios:bac00f32539ff134c6c258</string>
+	<string>1:1020081845385:ios:68106bf89bc14f15c6c258</string>
+	<key>DATABASE_URL</key>
+	<string>https://isoreg-b680e-default-rtdb.europe-west1.firebasedatabase.app</string>
 </dict>
 </plist>

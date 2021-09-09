@@ -1,15 +1,16 @@
 {
   "project_info": {
     "project_number": "1020081845385",
+    "firebase_url": "https://isoreg-b680e-default-rtdb.europe-west1.firebasedatabase.app",
     "project_id": "isoreg-b680e",
     "storage_bucket": "isoreg-b680e.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1020081845385:android:0c20e0d1fd0d1647c6c258",
+        "mobilesdk_app_id": "1:1020081845385:android:cf5c982d3dfd2563c6c258",
         "android_client_info": {
-          "package_name": "com.iso.registry"
+          "package_name": "com.bau.isoregistry"
         }
       },
       "oauth_client": [
