@@ -66,9 +66,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           if (!isEmail(value.toString())) {
                             return ("Please enter a valid email");
                           }
-                          if (!value.toString().contains("bahcesehir")) {
-                            return "Please use the university's email";
-                          }
                         },
                         style: const TextStyle(
                           fontFamily: "Proxima",

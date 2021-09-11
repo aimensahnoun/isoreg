@@ -170,7 +170,7 @@ class _LogSearchState extends State<LogSearch> {
                                       width: double.infinity,
                                       height: Platform.isIOS
                                           ? config.App(context).appHeight(17)
-                                          : config.App(context).appHeight(19),
+                                          : config.App(context).appHeight(27),
                                       decoration: BoxDecoration(
                                         color: Colors.white,
                                         borderRadius: BorderRadius.circular(15),

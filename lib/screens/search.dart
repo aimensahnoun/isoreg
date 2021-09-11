@@ -75,7 +75,7 @@ class _SearchState extends State<Search> {
                               setState(() {
                                 isSearching = true;
                               });
-                              var student = "";
+                              var student;
                               SharedPreferences prefs =
                                   await SharedPreferences.getInstance();
                               var jwt = await prefs.getString("jwt");
@@ -134,6 +134,7 @@ class _SearchState extends State<Search> {
                                 if (tempStudent.statusCode == 200) {
                                   String data = await tempStudent.body;
                                   var decodedData = jsonDecode(data);
+                                  print(student);
                                   student = decodedData;
                                 } else {
                                   print(tempStudent.body);
@@ -159,6 +160,7 @@ class _SearchState extends State<Search> {
                                 }
                               }
                               result = student == "" ? null : student;
+                              ;
 
                               setState(() {
                                 result = student == "" ? null : student;

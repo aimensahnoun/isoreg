@@ -50,20 +50,21 @@ class _StudentDetailsState extends State<StudentDetails> {
   var denklilValue = "Denklik Not Done";
 
   @override
-  void didChangeDependencies() {
+  void initState() {
     if ((int.parse(widget.student["current_step"]) != 74)) {
       _index = int.parse(widget.student["current_step"]) - 1;
       docCheckValue = widget.student["document_check_status"];
       denklilValue = widget.student["denklik_application_status"];
+      docCheckNote = widget.student["document_check_note"] ?? "";
+      denklinkNote = widget.student["denklik_application_note"] ?? "";
     } else {
       if (widget.student["application"] == "Bachlors") {
         _index = 5;
       } else {
         _index = 4;
       }
+      super.initState();
     }
-
-    super.didChangeDependencies();
   }
 
   showCongrats() {
@@ -124,12 +125,11 @@ class _StudentDetailsState extends State<StudentDetails> {
     });
   }
 
+  var docCheckNote = "";
+  var denklinkNote = "";
   Widget build(BuildContext context) {
-    var docCheckNote = "";
-    var denklinkNote = "";
     var userData = Provider.of<DataProvider>(context, listen: false).user;
 
-    print(widget.student["current_step"]);
     return Scaffold(
       backgroundColor: Colors.white,
       body: ModalProgressHUD(
@@ -444,7 +444,7 @@ class _StudentDetailsState extends State<StudentDetails> {
                                     ),
                                     onChanged: (String? newValue) {
                                       setState(() {
-                                        docCheckValue = newValue ?? "";
+                                        docCheckValue = newValue!;
                                       });
                                     },
                                     isExpanded: true,
@@ -467,9 +467,7 @@ class _StudentDetailsState extends State<StudentDetails> {
                                     docCheckNote = text;
                                   },
                                   controller: TextEditingController()
-                                    ..text =
-                                        widget.student["document_check_note"] ??
-                                            "",
+                                    ..text = docCheckNote,
                                   style: const TextStyle(
                                     fontFamily: "Proxima",
                                   ),
@@ -556,7 +554,7 @@ class _StudentDetailsState extends State<StudentDetails> {
                                 },
                                 autocorrect: false,
                                 controller: TextEditingController()
-                                  ..text = widget.student["denklik_note"] ?? "",
+                                  ..text = denklinkNote,
                                 style: const TextStyle(
                                   fontFamily: "Proxima",
                                 ),

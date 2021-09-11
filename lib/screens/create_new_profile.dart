@@ -203,9 +203,9 @@ class _CreateNewProfileState extends State<CreateNewProfile> {
   ];
   GlobalKey<FormState> formKey = new GlobalKey<FormState>();
   String _application = "Bachlors";
-  late String _department = "Android";
   String valueTest = "";
   FirebaseFirestore db = FirebaseFirestore.instance;
+  late String _department;
 
   @override
   Widget build(BuildContext context) {

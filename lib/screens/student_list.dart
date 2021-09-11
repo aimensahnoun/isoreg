@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../provider/data_provider.dart';
@@ -74,8 +75,12 @@ class _StudentListState extends State<StudentList> {
             } else if (details.delta.dx < 0) {
               if (isDrawerOpen) {
                 Navigator.of(context).pop();
+                isDrawerOpen = false;
+              } else {
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (BuildContext ctx) => Search(),
+                ));
               }
-              isDrawerOpen = false;
             }
           },
           child: SafeArea(
@@ -123,13 +128,21 @@ class _StudentListState extends State<StudentList> {
                         ),
                       )
                     : Expanded(
+                        child: LiquidPullToRefresh(
+                        onRefresh: () async {
+                          Provider.of<DataProvider>(context, listen: false)
+                              .fetchStudent();
+                        },
+                        showChildOpacityTransition: false,
                         child: ListView.builder(
-                        itemBuilder: (ctx, i) => StudentCard(
-                          student:
-                              Provider.of<DataProvider>(context).students[i],
+                          itemBuilder: (ctx, i) => StudentCard(
+                            student:
+                                Provider.of<DataProvider>(context).students[i],
+                          ),
+                          itemCount: Provider.of<DataProvider>(context)
+                              .students
+                              .length,
                         ),
-                        itemCount:
-                            Provider.of<DataProvider>(context).students.length,
                       ))
               ],
             ),

@@ -158,6 +158,8 @@ class DataProvider extends ChangeNotifier {
         String data = response.body;
         var decodedData = jsonDecode(data);
         logs = decodedData;
+        var reversedLogs = logs.reversed.toList();
+        logs = reversedLogs;
       } else {
         print(response.body);
       }
@@ -189,7 +191,14 @@ class DataProvider extends ChangeNotifier {
             decodedData!.where((element) => element["type"] == "Masters");
         stats = decodedData;
         bachlorStats = temp.toList();
+        bachlorStats.sort((a, b) => ((a["department"]
+            .toLowerCase()
+            .compareTo(b["department"].toLowerCase()))));
+
         mastersStats = tempMs.toList();
+        mastersStats.sort((a, b) => ((a["department"]
+            .toLowerCase()
+            .compareTo(b["department"].toLowerCase()))));
       } else {
         print(response.body);
       }
@@ -217,7 +226,6 @@ class DataProvider extends ChangeNotifier {
   }
 
   void addLog(message, time) async {
-    print("IN HERE");
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var jwt = await prefs.getString("jwt");
     var response =

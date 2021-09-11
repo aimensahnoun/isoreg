@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:isoregistration/provider/data_provider.dart';
 import 'package:isoregistration/screens/logs_search.dart';
+import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../helpers/custom_icons_icons.dart';
@@ -28,7 +29,7 @@ class _LogsPageState extends State<LogsPage> {
   @override
   Widget build(BuildContext context) {
     var logs = Provider.of<DataProvider>(context, listen: true).logs;
-    var test = FirebaseFirestore.instance.collection("logs").snapshots();
+
     // print(logs);
     var isDrawerOpen = false;
     return Scaffold(
@@ -44,8 +45,13 @@ class _LogsPageState extends State<LogsPage> {
             } else if (details.delta.dx < 0) {
               if (isDrawerOpen) {
                 Navigator.of(context).pop();
+                isDrawerOpen = false;
+              } else {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (BuildContext ctx) => LogSearch(
+                          logs: logs,
+                        )));
               }
-              isDrawerOpen = false;
             }
           },
           child: SafeArea(
@@ -90,62 +96,69 @@ class _LogsPageState extends State<LogsPage> {
                         : config.App(context).appHeight(3.5),
                   ),
                   Expanded(
-                    child: ListView.builder(
-                      itemCount: logs.length,
-                      itemBuilder: (context, i) {
-                        return Container(
-                          margin: const EdgeInsets.symmetric(
-                            vertical: 10,
-                          ),
-                          width: double.infinity,
-                          height: Platform.isIOS
-                              ? config.App(context).appHeight(17)
-                              : config.App(context).appHeight(19),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(15),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.3),
-                                spreadRadius: 2,
-                                blurRadius: 5,
-                                offset: Offset(0, 5),
-                              ),
-                            ],
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 10, horizontal: 20),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "Message : ${logs[i]["message"]}",
-                                  style: TextStyle(
-                                    fontSize: Platform.isIOS
-                                        ? config.App(context).appHeight(2)
-                                        : config.App(context).appHeight(2.5),
-                                    fontFamily: "Proxima",
-                                  ),
-                                ),
-                                SizedBox(
-                                    height: Platform.isIOS
-                                        ? config.App(context).appHeight(2)
-                                        : config.App(context).appHeight(2.5)),
-                                Text(
-                                  "Time : ${logs[i]["time"]}",
-                                  style: TextStyle(
-                                    fontSize: Platform.isIOS
-                                        ? config.App(context).appHeight(2)
-                                        : config.App(context).appHeight(2.5),
-                                    fontFamily: "Proxima",
-                                  ),
+                    child: LiquidPullToRefresh(
+                      onRefresh: () async {
+                        Provider.of<DataProvider>(context, listen: false)
+                            .fetchLogs();
+                      },
+                      showChildOpacityTransition: false,
+                      child: ListView.builder(
+                        itemCount: logs.length,
+                        itemBuilder: (context, i) {
+                          return Container(
+                            margin: const EdgeInsets.symmetric(
+                              vertical: 10,
+                            ),
+                            width: double.infinity,
+                            height: Platform.isIOS
+                                ? config.App(context).appHeight(17)
+                                : config.App(context).appHeight(27),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(15),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.3),
+                                  spreadRadius: 2,
+                                  blurRadius: 5,
+                                  offset: Offset(0, 5),
                                 ),
                               ],
                             ),
-                          ),
-                        );
-                      },
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 20),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "Message : ${logs[i]["message"]}",
+                                    style: TextStyle(
+                                      fontSize: Platform.isIOS
+                                          ? config.App(context).appHeight(2)
+                                          : config.App(context).appHeight(2.5),
+                                      fontFamily: "Proxima",
+                                    ),
+                                  ),
+                                  SizedBox(
+                                      height: Platform.isIOS
+                                          ? config.App(context).appHeight(2)
+                                          : config.App(context).appHeight(2.5)),
+                                  Text(
+                                    "Time : ${logs[i]["time"]}",
+                                    style: TextStyle(
+                                      fontSize: Platform.isIOS
+                                          ? config.App(context).appHeight(2)
+                                          : config.App(context).appHeight(2.5),
+                                      fontFamily: "Proxima",
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ),
                 ],

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:isoregistration/provider/data_provider.dart';
+import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:provider/provider.dart';
 
 import '../widgets/drawer.dart';
@@ -53,9 +54,6 @@ class _StatsState extends State<Stats> {
       return d
           .asMap()
           .map<int, PieChartSectionData>((key, data) {
-            print(((int.parse(data["value"]["count"]) / totalStudents) * 100)
-                .round());
-
             var percentage =
                 ((int.parse(data["value"]["count"]) / totalStudents) * 100)
                     .round();
@@ -97,270 +95,283 @@ class _StatsState extends State<Stats> {
               ? Center(
                   child: Container(),
                 )
-              : SingleChildScrollView(
-                  child: SafeArea(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 10,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Statistics",
-                            style: TextStyle(
-                              fontFamily: "Proxima",
-                              fontSize: Platform.isIOS
-                                  ? config.App(context).appHeight(4)
-                                  : config.App(context).appHeight(4.5),
+              : LiquidPullToRefresh(
+                  onRefresh: () async {
+                    Provider.of<DataProvider>(context, listen: false)
+                        .fetchStats();
+                    Provider.of<DataProvider>(context, listen: false)
+                        .getApplis();
+                  },
+                  showChildOpacityTransition: false,
+                  child: SingleChildScrollView(
+                    child: SafeArea(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 10,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Statistics",
+                              style: TextStyle(
+                                fontFamily: "Proxima",
+                                fontSize: Platform.isIOS
+                                    ? config.App(context).appHeight(4)
+                                    : config.App(context).appHeight(4.5),
+                              ),
                             ),
-                          ),
-                          SingleChildScrollView(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  height: Platform.isIOS
-                                      ? config.App(context).appHeight(2)
-                                      : config.App(context).appHeight(2.5),
-                                ),
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                    vertical: 10,
-                                    horizontal: 20,
+                            SingleChildScrollView(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    height: Platform.isIOS
+                                        ? config.App(context).appHeight(2)
+                                        : config.App(context).appHeight(2.5),
                                   ),
-                                  width: double.infinity,
-                                  height: Platform.isIOS
-                                      ? config.App(context).appHeight(35)
-                                      : config.App(context).appHeight(41),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(15),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.grey.withOpacity(0.3),
-                                        spreadRadius: 2,
-                                        blurRadius: 5,
-                                        offset: Offset(0, 5),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        "Total Student Number : ${int.parse(bachApplis[0]["count"]) + int.parse(masterApplis[0]["count"])}",
-                                        style: TextStyle(
-                                          fontFamily: "Proxima",
-                                          fontSize: Platform.isIOS
-                                              ? config.App(context).appHeight(2)
-                                              : config.App(context)
-                                                  .appHeight(2.5),
+                                  Container(
+                                    padding: EdgeInsets.symmetric(
+                                      vertical: 10,
+                                      horizontal: 20,
+                                    ),
+                                    width: double.infinity,
+                                    height: Platform.isIOS
+                                        ? config.App(context).appHeight(35)
+                                        : config.App(context).appHeight(41),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(15),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.3),
+                                          spreadRadius: 2,
+                                          blurRadius: 5,
+                                          offset: Offset(0, 5),
                                         ),
-                                      ),
-                                      Text(
-                                        "Undergraduate Students : ${bachApplis[0]["count"]}",
-                                        style: TextStyle(
-                                          fontFamily: "Proxima",
-                                          fontSize: Platform.isIOS
-                                              ? config.App(context).appHeight(2)
-                                              : config.App(context)
-                                                  .appHeight(2.5),
+                                      ],
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "Total Student Number : ${int.parse(bachApplis[0]["count"]) + int.parse(masterApplis[0]["count"])}",
+                                          style: TextStyle(
+                                            fontFamily: "Proxima",
+                                            fontSize: Platform.isIOS
+                                                ? config.App(context)
+                                                    .appHeight(2)
+                                                : config.App(context)
+                                                    .appHeight(2.5),
+                                          ),
                                         ),
-                                      ),
-                                      Text(
-                                        "Masters Students : ${masterApplis[0]["count"]}",
-                                        style: TextStyle(
-                                          fontFamily: "Proxima",
-                                          fontSize: Platform.isIOS
-                                              ? config.App(context).appHeight(2)
-                                              : config.App(context)
-                                                  .appHeight(2.5),
+                                        Text(
+                                          "Undergraduate Students : ${bachApplis[0]["count"]}",
+                                          style: TextStyle(
+                                            fontFamily: "Proxima",
+                                            fontSize: Platform.isIOS
+                                                ? config.App(context)
+                                                    .appHeight(2)
+                                                : config.App(context)
+                                                    .appHeight(2.5),
+                                          ),
                                         ),
-                                      ),
-                                      SizedBox(
-                                        height:
-                                            config.App(context).appHeight(1),
-                                      ),
-                                      Expanded(
-                                        child: PieChart(
-                                          PieChartData(
-                                            sections: getSections(
-                                              {
-                                                "bachlors": bachApplis[0],
-                                                "masters": masterApplis[0]
-                                              },
-                                              int.parse(
-                                                      bachApplis[0]["count"]) +
-                                                  int.parse(
-                                                      masterApplis[0]["count"]),
+                                        Text(
+                                          "Masters Students : ${masterApplis[0]["count"]}",
+                                          style: TextStyle(
+                                            fontFamily: "Proxima",
+                                            fontSize: Platform.isIOS
+                                                ? config.App(context)
+                                                    .appHeight(2)
+                                                : config.App(context)
+                                                    .appHeight(2.5),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height:
+                                              config.App(context).appHeight(1),
+                                        ),
+                                        Expanded(
+                                          child: PieChart(
+                                            PieChartData(
+                                              sections: getSections(
+                                                {
+                                                  "bachlors": bachApplis[0],
+                                                  "masters": masterApplis[0]
+                                                },
+                                                int.parse(bachApplis[0]
+                                                        ["count"]) +
+                                                    int.parse(masterApplis[0]
+                                                        ["count"]),
+                                              ),
                                             ),
                                           ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                SizedBox(
-                                  height: Platform.isIOS
-                                      ? config.App(context).appHeight(2)
-                                      : config.App(context).appHeight(2.5),
-                                ),
-                                Text(
-                                  "Undergraduate Departments",
-                                  style: TextStyle(
-                                    fontFamily: "Proxima",
-                                    fontSize: Platform.isIOS
-                                        ? config.App(context).appHeight(2.5)
-                                        : config.App(context).appHeight(3),
+                                  SizedBox(
+                                    height: Platform.isIOS
+                                        ? config.App(context).appHeight(2)
+                                        : config.App(context).appHeight(2.5),
                                   ),
-                                ),
-                                SizedBox(
-                                  height: Platform.isIOS
-                                      ? config.App(context).appHeight(2)
-                                      : config.App(context).appHeight(2.5),
-                                ),
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                    vertical: 10,
-                                    horizontal: 20,
+                                  Text(
+                                    "Undergraduate Departments",
+                                    style: TextStyle(
+                                      fontFamily: "Proxima",
+                                      fontSize: Platform.isIOS
+                                          ? config.App(context).appHeight(2.5)
+                                          : config.App(context).appHeight(3),
+                                    ),
                                   ),
-                                  width: double.infinity,
-                                  height: Platform.isIOS
-                                      ? config.App(context).appHeight(35)
-                                      : config.App(context).appHeight(41),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(15),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.grey.withOpacity(0.3),
-                                        spreadRadius: 2,
-                                        blurRadius: 5,
-                                        offset: Offset(0, 5),
-                                      ),
-                                    ],
+                                  SizedBox(
+                                    height: Platform.isIOS
+                                        ? config.App(context).appHeight(2)
+                                        : config.App(context).appHeight(2.5),
                                   ),
-                                  child: ListView.builder(
-                                    itemCount: bachlorStats.length,
-                                    itemBuilder: (context, i) {
-                                      if (i == 0) {
-                                        return Column(
-                                          children: [
-                                            DeparmentChart(
-                                              larg: int.parse(
-                                                  bachApplis[0]["count"]),
-                                              title:
-                                                  "Total Undergraduate Students",
-                                              count: int.parse(
-                                                  bachApplis[0]["count"]),
-                                              type: 0,
-                                            ),
-                                            DeparmentChart(
-                                              larg: int.parse(
-                                                  bachApplis[0]["count"]),
-                                              title: bachlorStats[i]
-                                                  ["department"],
-                                              count: int.parse(
-                                                  bachlorStats[i]["count"]),
-                                              type: 0,
-                                            )
-                                          ],
+                                  Container(
+                                    padding: EdgeInsets.symmetric(
+                                      vertical: 10,
+                                      horizontal: 20,
+                                    ),
+                                    width: double.infinity,
+                                    height: Platform.isIOS
+                                        ? config.App(context).appHeight(35)
+                                        : config.App(context).appHeight(41),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(15),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.3),
+                                          spreadRadius: 2,
+                                          blurRadius: 5,
+                                          offset: Offset(0, 5),
+                                        ),
+                                      ],
+                                    ),
+                                    child: ListView.builder(
+                                      itemCount: bachlorStats.length,
+                                      itemBuilder: (context, i) {
+                                        if (i == 0) {
+                                          return Column(
+                                            children: [
+                                              DeparmentChart(
+                                                larg: int.parse(
+                                                    bachApplis[0]["count"]),
+                                                title:
+                                                    "Total Undergraduate Students",
+                                                count: int.parse(
+                                                    bachApplis[0]["count"]),
+                                                type: 0,
+                                              ),
+                                              DeparmentChart(
+                                                larg: int.parse(
+                                                    bachApplis[0]["count"]),
+                                                title: bachlorStats[i]
+                                                    ["department"],
+                                                count: int.parse(
+                                                    bachlorStats[i]["count"]),
+                                                type: 0,
+                                              )
+                                            ],
+                                          );
+                                        }
+                                        return DeparmentChart(
+                                          larg:
+                                              int.parse(bachApplis[0]["count"]),
+                                          title: bachlorStats[i]["department"],
+                                          count: int.parse(
+                                              bachlorStats[i]["count"]),
+                                          type: 0,
                                         );
-                                      }
-                                      return DeparmentChart(
-                                        larg: int.parse(bachApplis[0]["count"]),
-                                        title: bachlorStats[i]["department"],
-                                        count:
-                                            int.parse(bachlorStats[i]["count"]),
-                                        type: 0,
-                                      );
-                                    },
+                                      },
+                                    ),
                                   ),
-                                ),
-                                SizedBox(
-                                  height: Platform.isIOS
-                                      ? config.App(context).appHeight(2)
-                                      : config.App(context).appHeight(2.5),
-                                ),
-                                Text(
-                                  "Graduate Departments",
-                                  style: TextStyle(
-                                    fontFamily: "Proxima",
-                                    fontSize: Platform.isIOS
-                                        ? config.App(context).appHeight(2.5)
-                                        : config.App(context).appHeight(3),
+                                  SizedBox(
+                                    height: Platform.isIOS
+                                        ? config.App(context).appHeight(2)
+                                        : config.App(context).appHeight(2.5),
                                   ),
-                                ),
-                                SizedBox(
-                                  height: Platform.isIOS
-                                      ? config.App(context).appHeight(2)
-                                      : config.App(context).appHeight(2.5),
-                                ),
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                    vertical: 10,
-                                    horizontal: 20,
+                                  Text(
+                                    "Graduate Departments",
+                                    style: TextStyle(
+                                      fontFamily: "Proxima",
+                                      fontSize: Platform.isIOS
+                                          ? config.App(context).appHeight(2.5)
+                                          : config.App(context).appHeight(3),
+                                    ),
                                   ),
-                                  width: double.infinity,
-                                  height: Platform.isIOS
-                                      ? config.App(context).appHeight(35)
-                                      : config.App(context).appHeight(41),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(15),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.grey.withOpacity(0.3),
-                                        spreadRadius: 2,
-                                        blurRadius: 5,
-                                        offset: Offset(0, 5),
-                                      ),
-                                    ],
+                                  SizedBox(
+                                    height: Platform.isIOS
+                                        ? config.App(context).appHeight(2)
+                                        : config.App(context).appHeight(2.5),
                                   ),
-                                  child: ListView.builder(
-                                    itemCount: masterStats.length,
-                                    itemBuilder: (context, i) {
-                                      if (i == 0) {
-                                        return Column(
-                                          children: [
-                                            DeparmentChart(
-                                              larg: int.parse(
-                                                  masterApplis[0]["count"]),
-                                              title: "Total Masters Students",
-                                              count: int.parse(
-                                                  masterApplis[0]["count"]),
-                                              type: 1,
-                                            ),
-                                            DeparmentChart(
-                                              larg: int.parse(
-                                                  masterApplis[0]["count"]),
-                                              title: masterStats[i]
-                                                  ["department"],
-                                              count: int.parse(
-                                                  masterStats[i]["count"]),
-                                              type: 1,
-                                            )
-                                          ],
+                                  Container(
+                                    padding: EdgeInsets.symmetric(
+                                      vertical: 10,
+                                      horizontal: 20,
+                                    ),
+                                    width: double.infinity,
+                                    height: Platform.isIOS
+                                        ? config.App(context).appHeight(35)
+                                        : config.App(context).appHeight(41),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(15),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.3),
+                                          spreadRadius: 2,
+                                          blurRadius: 5,
+                                          offset: Offset(0, 5),
+                                        ),
+                                      ],
+                                    ),
+                                    child: ListView.builder(
+                                      itemCount: masterStats.length,
+                                      itemBuilder: (context, i) {
+                                        if (i == 0) {
+                                          return Column(
+                                            children: [
+                                              DeparmentChart(
+                                                larg: int.parse(
+                                                    masterApplis[0]["count"]),
+                                                title: "Total Masters Students",
+                                                count: int.parse(
+                                                    masterApplis[0]["count"]),
+                                                type: 1,
+                                              ),
+                                              DeparmentChart(
+                                                larg: int.parse(
+                                                    masterApplis[0]["count"]),
+                                                title: masterStats[i]
+                                                    ["department"],
+                                                count: int.parse(
+                                                    masterStats[i]["count"]),
+                                                type: 1,
+                                              )
+                                            ],
+                                          );
+                                        }
+                                        return DeparmentChart(
+                                          larg: int.parse(
+                                              masterApplis[0]["count"]),
+                                          title: masterStats[i]["department"],
+                                          count: int.parse(
+                                              masterStats[i]["count"]),
+                                          type: 1,
                                         );
-                                      }
-                                      return DeparmentChart(
-                                        larg:
-                                            int.parse(masterApplis[0]["count"]),
-                                        title: masterStats[i]["department"],
-                                        count:
-                                            int.parse(masterStats[i]["count"]),
-                                        type: 1,
-                                      );
-                                    },
+                                      },
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
